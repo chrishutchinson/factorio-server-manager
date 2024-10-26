@@ -1,0 +1,35 @@
+{
+  "name": "factorio-server-manager",
+  "version": "1.0.0",
+  "description": "A Node.js library for managing and interacting with Factorio servers",
+  "main": "lib/index.ts",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chrishutchinson/factorio-server-manager.git"
+  },
+  "keywords": [
+    "factorio"
+  ],
+  "author": "Chris Hutchinson",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/chrishutchinson/factorio-server-manager/issues"
+  },
+  "homepage": "https://github.com/chrishutchinson/factorio-server-manager#readme",
+  "dependencies": {
+    "@aws-sdk/client-cloudformation": "^3.679.0",
+    "rcon-srcds": "^2.1.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.7.9",
+    "aws-sdk-client-mock": "^4.1.0",
+    "aws-sdk-client-mock-jest": "^4.1.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5",
+    "typescript": "^5.6.3"
+  }
+}
