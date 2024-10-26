@@ -17,15 +17,15 @@ yarn add factorio-server-manager
 
 ## Usage
 
-### Basic usage with CloudFormation
+### Basic usage with the `m-chandler/factorio-spot-pricing` CloudFormation server
 
 ```ts
 import {
   FactorioServerManager,
-  CloudFormationServer,
+  MChandlerCloudFormationServer,
 } from "factorio-server-manager";
 
-const server = new CloudFormationServer({
+const server = new MChandlerCloudFormationServer({
   stackName: "my-factorio-stack-name",
   region: "us-east-1",
 });
@@ -40,10 +40,10 @@ await serverManager.start();
 ```ts
 import {
   FactorioServerManager,
-  CloudFormationServer,
+  MChandlerCloudFormationServer,
 } from "factorio-server-manager";
 
-const server = new CloudFormationServer({
+const server = new MChandlerCloudFormationServer({
   stackName: "my-factorio-stack-name",
   region: "us-east-1",
 });
@@ -66,10 +66,10 @@ await serverManager.getPlayers();
 ```ts
 import {
   FactorioServerManager,
-  CloudFormationServer,
+  MChandlerCloudFormationServer,
 } from "factorio-server-manager";
 
-const server = new CloudFormationServer({
+const server = new MChandlerCloudFormationServer({
   stackName: "my-factorio-stack-name",
   region: "us-east-1",
 });
@@ -129,3 +129,15 @@ This library is designed to be used in a variety of ways, including:
 - As part of a chat bot
 
 I personally use this library in a Telegram bot, that maps simple commands (e.g. `/start`, `/stop`, `/status`) to the methods provided by the `FactorioServerManager` class. It also supports more complex commands via RCON, as well as automatic shutdowns based on the number of players online.
+
+## Examples
+
+### CloudFormation (`./examples/CloudFormation`)
+
+This example demonstrates how to use the `FactorioServerManager` class with a `m-chandler/factorio-spot-pricing` CloudFormation server.
+
+Follow the instructions in the `.env.sample` file, then run the example script with:
+
+```bash
+npm run examples:CloudFormation
+```

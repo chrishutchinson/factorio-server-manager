@@ -1,13 +1,73 @@
 import {
   CloudFormationClient,
   DescribeStacksCommand,
+  Parameter,
   UpdateStackCommand,
 } from "@aws-sdk/client-cloudformation";
 
 import { ServerInterface, ServerState } from "../ServerInterface";
 
-export class CloudFormationServer implements ServerInterface {
-  constructor(private cf: CloudFormationClient, private stackName: string) {}
+type LaunchArgument =
+  | {
+      usePreviousValue: true;
+    }
+  | {
+      value: string;
+    };
+
+type LaunchArguments = Record<
+  | "EnableRcon"
+  | "FactorioImageTag"
+  | "HostedZoneId"
+  | "RecordName"
+  | "KeyPairName"
+  | "YourIp",
+  LaunchArgument
+>;
+
+export class MChandlerCloudFormationServer implements ServerInterface {
+  static defaultLaunchArguments: LaunchArguments = {
+    EnableRcon: { usePreviousValue: true },
+    FactorioImageTag: { usePreviousValue: true },
+    HostedZoneId: { usePreviousValue: true },
+    RecordName: { usePreviousValue: true },
+    KeyPairName: { usePreviousValue: true },
+    YourIp: { usePreviousValue: true },
+  };
+
+  private launchArguments: LaunchArguments;
+
+  constructor(
+    private cf: CloudFormationClient,
+    private stackName: string,
+    launchArguments: Partial<LaunchArguments> = MChandlerCloudFormationServer.defaultLaunchArguments
+  ) {
+    this.launchArguments = {
+      ...MChandlerCloudFormationServer.defaultLaunchArguments,
+      ...launchArguments,
+    };
+  }
+
+  private _calculateParameters(): Array<Parameter> {
+    return Object.entries(this.launchArguments).map(([key, argument]) => {
+      if ("usePreviousValue" in argument) {
+        return {
+          ParameterKey: key,
+          UsePreviousValue: true,
+        };
+      }
+
+      if ("value" in argument) {
+        return {
+          ParameterKey: key,
+          UsePreviousValue: false,
+          ParameterValue: argument.value,
+        };
+      }
+
+      throw new Error("Invalid argument");
+    });
+  }
 
   async getState(): Promise<ServerState> {
     try {
@@ -57,30 +117,7 @@ export class CloudFormationServer implements ServerInterface {
           UsePreviousValue: false,
           ParameterValue: "Running",
         },
-        {
-          ParameterKey: "FactorioImageTag",
-          UsePreviousValue: true,
-        },
-        {
-          ParameterKey: "HostedZoneId",
-          UsePreviousValue: true,
-        },
-        {
-          ParameterKey: "RecordName",
-          UsePreviousValue: true,
-        },
-        {
-          ParameterKey: "KeyPairName",
-          UsePreviousValue: true,
-        },
-        {
-          ParameterKey: "YourIp",
-          UsePreviousValue: true,
-        },
-        {
-          ParameterKey: "EnableRcon",
-          UsePreviousValue: true,
-        },
+        ...this._calculateParameters(),
       ],
       UsePreviousTemplate: true,
       Capabilities: ["CAPABILITY_IAM"],
@@ -99,30 +136,7 @@ export class CloudFormationServer implements ServerInterface {
           UsePreviousValue: false,
           ParameterValue: "Stopped",
         },
-        {
-          ParameterKey: "FactorioImageTag",
-          UsePreviousValue: true,
-        },
-        {
-          ParameterKey: "HostedZoneId",
-          UsePreviousValue: true,
-        },
-        {
-          ParameterKey: "RecordName",
-          UsePreviousValue: true,
-        },
-        {
-          ParameterKey: "KeyPairName",
-          UsePreviousValue: true,
-        },
-        {
-          ParameterKey: "YourIp",
-          UsePreviousValue: true,
-        },
-        {
-          ParameterKey: "EnableRcon",
-          UsePreviousValue: true,
-        },
+        ...this._calculateParameters(),
       ],
       Capabilities: ["CAPABILITY_IAM"],
     });

@@ -1,5 +1,5 @@
-import { CloudFormationServer } from "./CloudFormation";
+import { MChandlerCloudFormationServer } from "./MChandlerCloudFormationServer";
 
 export const servers = {
-  cloudFormation: CloudFormationServer,
+  mChandlerCloudFormationServer: MChandlerCloudFormationServer,
 };

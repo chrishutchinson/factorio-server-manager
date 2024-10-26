@@ -6,23 +6,36 @@ import {
 } from "@aws-sdk/client-cloudformation";
 import { mockClient } from "aws-sdk-client-mock";
 
-import { CloudFormationServer } from "../CloudFormation";
 import { ServerState } from "../../ServerInterface";
+import { MChandlerCloudFormationServer } from "../MChandlerCloudFormationServer";
 
 const cloudformationMock = mockClient(CloudFormationClient);
 
-describe("CloudFormation Server", () => {
+describe("m-chandler/factorio-spot-pricing CloudFormation Server", () => {
   beforeEach(() => {
     cloudformationMock.reset();
   });
 
-  describe("#getstate()", () => {
+  describe("#defaultLaunchArguments", () => {
+    it("should use the previous value for all launch argument parameters, and expose this statically on the class", () => {
+      expect(MChandlerCloudFormationServer.defaultLaunchArguments).toEqual({
+        EnableRcon: { usePreviousValue: true },
+        FactorioImageTag: { usePreviousValue: true },
+        HostedZoneId: { usePreviousValue: true },
+        KeyPairName: { usePreviousValue: true },
+        RecordName: { usePreviousValue: true },
+        YourIp: { usePreviousValue: true },
+      });
+    });
+  });
+
+  describe("#getState()", () => {
     it("should return an UNKNOWN state if stacks are undefined", async () => {
       cloudformationMock.on(DescribeStacksCommand).resolves({
         Stacks: undefined,
       });
 
-      const server = new CloudFormationServer(
+      const server = new MChandlerCloudFormationServer(
         new CloudFormationClient(),
         "test-stack"
       );
@@ -37,7 +50,7 @@ describe("CloudFormation Server", () => {
         Stacks: [],
       });
 
-      const server = new CloudFormationServer(
+      const server = new MChandlerCloudFormationServer(
         new CloudFormationClient(),
         "test-stack"
       );
@@ -64,7 +77,7 @@ describe("CloudFormation Server", () => {
         ],
       });
 
-      const server = new CloudFormationServer(
+      const server = new MChandlerCloudFormationServer(
         new CloudFormationClient(),
         "test-stack"
       );
@@ -91,7 +104,7 @@ describe("CloudFormation Server", () => {
         ],
       });
 
-      const server = new CloudFormationServer(
+      const server = new MChandlerCloudFormationServer(
         new CloudFormationClient(),
         "test-stack"
       );
@@ -118,7 +131,7 @@ describe("CloudFormation Server", () => {
         ],
       });
 
-      const server = new CloudFormationServer(
+      const server = new MChandlerCloudFormationServer(
         new CloudFormationClient(),
         "test-stack"
       );
@@ -145,7 +158,7 @@ describe("CloudFormation Server", () => {
         ],
       });
 
-      const server = new CloudFormationServer(
+      const server = new MChandlerCloudFormationServer(
         new CloudFormationClient(),
         "test-stack"
       );
@@ -172,7 +185,7 @@ describe("CloudFormation Server", () => {
         ],
       });
 
-      const server = new CloudFormationServer(
+      const server = new MChandlerCloudFormationServer(
         new CloudFormationClient(),
         "test-stack"
       );
@@ -185,7 +198,7 @@ describe("CloudFormation Server", () => {
 
   describe("#start()", () => {
     it("should issue an UpdateStackCommand passing the correct stack name, reusing the existing template, and with the correct capabilities", async () => {
-      const server = new CloudFormationServer(
+      const server = new MChandlerCloudFormationServer(
         new CloudFormationClient(),
         "test-stack"
       );
@@ -201,7 +214,7 @@ describe("CloudFormation Server", () => {
     });
 
     it("should set the ServerState parameter to 'Running'", async () => {
-      const server = new CloudFormationServer(
+      const server = new MChandlerCloudFormationServer(
         new CloudFormationClient(),
         "test-stack"
       );
@@ -229,7 +242,7 @@ describe("CloudFormation Server", () => {
     ])(
       "should use the previous value for the %s parameter",
       async (parameterKey) => {
-        const server = new CloudFormationServer(
+        const server = new MChandlerCloudFormationServer(
           new CloudFormationClient(),
           "test-stack"
         );
@@ -249,11 +262,60 @@ describe("CloudFormation Server", () => {
         );
       }
     );
+
+    it("should start the server with custom parameters if they are provided, along with the remaining default parameters", async () => {
+      const server = new MChandlerCloudFormationServer(
+        new CloudFormationClient(),
+        "test-stack",
+        {
+          ...MChandlerCloudFormationServer.defaultLaunchArguments,
+          HostedZoneId: {
+            value: "test-hosted-zone-id",
+          },
+          EnableRcon: {
+            value: "false",
+          },
+        }
+      );
+
+      await server.start();
+
+      expect(cloudformationMock).toHaveReceivedCommandWith(UpdateStackCommand, {
+        Parameters: expect.arrayContaining([
+          {
+            ParameterKey: "EnableRcon",
+            UsePreviousValue: false,
+            ParameterValue: "false",
+          },
+          {
+            ParameterKey: "HostedZoneId",
+            UsePreviousValue: false,
+            ParameterValue: "test-hosted-zone-id",
+          },
+          {
+            ParameterKey: "FactorioImageTag",
+            UsePreviousValue: true,
+          },
+          {
+            ParameterKey: "RecordName",
+            UsePreviousValue: true,
+          },
+          {
+            ParameterKey: "KeyPairName",
+            UsePreviousValue: true,
+          },
+          {
+            ParameterKey: "YourIp",
+            UsePreviousValue: true,
+          },
+        ]),
+      });
+    });
   });
 
   describe("#stop()", () => {
     it("should issue an UpdateStackCommand passing the correct stack name, reusing the existing template, and with the correct capabilities", async () => {
-      const server = new CloudFormationServer(
+      const server = new MChandlerCloudFormationServer(
         new CloudFormationClient(),
         "test-stack"
       );
@@ -269,7 +331,7 @@ describe("CloudFormation Server", () => {
     });
 
     it("should set the ServerState parameter to 'Stopped'", async () => {
-      const server = new CloudFormationServer(
+      const server = new MChandlerCloudFormationServer(
         new CloudFormationClient(),
         "test-stack"
       );
@@ -297,7 +359,7 @@ describe("CloudFormation Server", () => {
     ])(
       "should use the previous value for the %s parameter",
       async (parameterKey) => {
-        const server = new CloudFormationServer(
+        const server = new MChandlerCloudFormationServer(
           new CloudFormationClient(),
           "test-stack"
         );
@@ -317,5 +379,54 @@ describe("CloudFormation Server", () => {
         );
       }
     );
+  });
+
+  it("should start the server with custom parameters if they are provided, along with the remaining default parameters", async () => {
+    const server = new MChandlerCloudFormationServer(
+      new CloudFormationClient(),
+      "test-stack",
+      {
+        ...MChandlerCloudFormationServer.defaultLaunchArguments,
+        HostedZoneId: {
+          value: "test-hosted-zone-id",
+        },
+        EnableRcon: {
+          value: "false",
+        },
+      }
+    );
+
+    await server.stop();
+
+    expect(cloudformationMock).toHaveReceivedCommandWith(UpdateStackCommand, {
+      Parameters: expect.arrayContaining([
+        {
+          ParameterKey: "EnableRcon",
+          UsePreviousValue: false,
+          ParameterValue: "false",
+        },
+        {
+          ParameterKey: "HostedZoneId",
+          UsePreviousValue: false,
+          ParameterValue: "test-hosted-zone-id",
+        },
+        {
+          ParameterKey: "FactorioImageTag",
+          UsePreviousValue: true,
+        },
+        {
+          ParameterKey: "RecordName",
+          UsePreviousValue: true,
+        },
+        {
+          ParameterKey: "KeyPairName",
+          UsePreviousValue: true,
+        },
+        {
+          ParameterKey: "YourIp",
+          UsePreviousValue: true,
+        },
+      ]),
+    });
   });
 });
