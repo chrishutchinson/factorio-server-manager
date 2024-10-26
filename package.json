@@ -15,7 +15,7 @@
     "factorio"
   ],
   "author": "Chris Hutchinson",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/chrishutchinson/factorio-server-manager/issues"
   },
