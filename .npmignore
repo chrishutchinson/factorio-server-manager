@@ -1,0 +1,6 @@
+jest.config.js
+examples/
+tsconfig.json
+lib/
+dist/examples/
+dist/**/__tests__/

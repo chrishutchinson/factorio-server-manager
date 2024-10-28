@@ -11,7 +11,9 @@ This server is designed to interact with a CloudFormation stack, deployed based 
 ### Standard usage
 
 ```ts
-import { MChandlerCloudFormationServer } from "factorio-server-manager";
+import { servers } from "factorio-server-manager";
+
+const { MChandlerCloudFormationServer } = servers;
 
 const cf = new CloudFormation({
   region: "us-east-1",
@@ -23,7 +25,9 @@ const server = new MChandlerCloudFormationServer(cf, "my-factorio-stack-name");
 ### With custom launch parameters
 
 ```ts
-import { MChandlerCloudFormationServer } from "factorio-server-manager";
+import { servers } from "factorio-server-manager";
+
+const { MChandlerCloudFormationServer } = servers;
 
 const cf = new CloudFormation({
   region: "us-east-1",
@@ -55,7 +59,9 @@ By default, these will use the current parameter value. If you want to override 
 The full parameter set is available statically on the class (`.defaultLaunchArguments`):
 
 ```ts
-import { MChandlerCloudFormationServer } from "factorio-server-manager";
+import { servers } from "factorio-server-manager";
+
+const { MChandlerCloudFormationServer } = servers;
 
 console.log(MChandlerCloudFormationServer.defaultLaunchArguments);
 ```

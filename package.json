@@ -2,9 +2,11 @@
   "name": "factorio-server-manager",
   "version": "1.0.0",
   "description": "A Node.js library for managing and interacting with Factorio servers",
-  "main": "lib/index.ts",
+  "main": "dist/lib/index.js",
+  "types": "dist/lib/index.d.ts",
   "scripts": {
     "test": "jest",
+    "prepublish": "tsc",
     "examples:CloudFormation": "ts-node examples/CloudFormation/main.ts"
   },
   "repository": {
@@ -20,7 +22,8 @@
     "url": "https://github.com/chrishutchinson/factorio-server-manager/issues"
   },
   "homepage": "https://github.com/chrishutchinson/factorio-server-manager#readme",
-  "dependencies": {
+  "dependencies": {},
+  "peerDependencies": {
     "@aws-sdk/client-cloudformation": "^3.679.0",
     "rcon-srcds": "^2.1.0"
   },

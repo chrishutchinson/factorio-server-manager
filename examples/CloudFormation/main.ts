@@ -2,8 +2,9 @@ import "dotenv/config";
 import { CloudFormationClient } from "@aws-sdk/client-cloudformation";
 import RCON from "rcon-srcds";
 
-import { FactorioServerManager } from "../../lib";
-import { MChandlerCloudFormationServer } from "../../lib/servers/MChandlerCloudFormationServer";
+import { FactorioServerManager, servers } from "../../lib";
+
+const { MChandlerCloudFormationServer } = servers;
 
 const factorio = new FactorioServerManager(
   new MChandlerCloudFormationServer(
